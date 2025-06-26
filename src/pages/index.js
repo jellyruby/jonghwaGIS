@@ -1,16 +1,27 @@
 import Head from 'next/head';
 
 import Layout from '@components/Layout';
-import Section from '@components/Section';
-import Container from '@components/Container';
-import Map from '@components/Map';
-import Button from '@components/Button';
+// 새로 만든 페이지 컴포넌트들을 import 합니다.
+import WorldMap from './WorldMap';
+import MyLocationInfo  from './MyLocationInfo'
 
-import styles from '@styles/Home.module.scss';
+// useGeolocation 훅을 여기서 직접 사용합니다.
+import useGeolocation from '@hooks/useGeolocation';
 
-const DEFAULT_CENTER = [38.907132, -77.036546]
+
+const DEFAULT_CENTER = [37.507132, 127.01]
+
 
 export default function Home() {
+
+    // 1. 상태(위치 정보)를 부모 컴포넌트에서 관리합니다.
+    const { loading, error, data: locationData } = useGeolocation();
+
+    // 2. 현재 위치가 있으면 사용하고, 없으면 기본 위치를 사용합니다.
+    const mapCenter = locationData.latitude && locationData.longitude 
+      ? [locationData.latitude, locationData.longitude] 
+      : DEFAULT_CENTER;
+
   return (
     <Layout>
       <Head>
@@ -19,37 +30,12 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Section>
-        <Container>
-          <h1 className={styles.title}>
-            Next.js Leaflet Starter
-          </h1>
+      {/* 지도 섹션 컴포넌트 */}
+      <WorldMap center={mapCenter} myLocation={locationData} />
 
-          <Map className={styles.homeMap} width="800" height="400" center={DEFAULT_CENTER} zoom={12}>
-            {({ TileLayer, Marker, Popup }) => (
-              <>
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-                />
-                <Marker position={DEFAULT_CENTER}>
-                  <Popup>
-                    A pretty CSS3 popup. <br /> Easily customizable.
-                  </Popup>
-                </Marker>
-              </>
-            )}
-          </Map>
-
-          <p className={styles.description}>
-            <code className={styles.code}>npx create-next-app -e https://github.com/colbyfayock/next-leaflet-starter</code>
-          </p>
-
-          <p className={styles.view}>
-            <Button href="https://github.com/colbyfayock/next-leaflet-starter">Vew on GitHub</Button>
-          </p>
-        </Container>
-      </Section>
+      {/* 위치 정보 섹션 컴포넌트 */}
+      <MyLocationInfo loading={loading} error={error} locationData={locationData} />
+      
     </Layout>
   )
 }

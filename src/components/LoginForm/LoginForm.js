@@ -17,6 +17,7 @@ const LoginForm = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ userid, password }),
+        credentials: 'include', // 쿠키를 주고받기 위해 추가
       });
 
       if (response.ok) {

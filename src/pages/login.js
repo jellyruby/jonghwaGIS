@@ -3,7 +3,7 @@ import LoginForm from '@components/LoginForm';
 
 const LoginPage = () => {
   return (
-    <Layout>
+    <Layout center>
       <LoginForm />
     </Layout>
   );
@@ -16,7 +16,10 @@ export async function getServerSideProps(context) {
 
   // 쿠키가 없는 경우 종료
   if (!cookie) {
-    return;
+    return {
+      props: {
+      },
+    };
   }
 
   try {

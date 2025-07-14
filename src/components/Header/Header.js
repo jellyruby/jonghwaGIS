@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { FaGithub } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
 
 import Container from '@components/Container';
 
@@ -8,6 +9,28 @@ import styles from './Header.module.scss';
 
 const Header = () => {
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const response = await fetch('http://localhost:8888/auth/profile', {
+          method: 'GET',
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } catch (error) {
+        console.error('Error checking login status:', error);
+        setIsLoggedIn(false);
+      }
+    };
+    checkStatus();
+  }, []);
 
   const logout = async (e) => {
     e.preventDefault();
@@ -21,12 +44,11 @@ const Header = () => {
         router.push('/login');
       } else {
         console.error('Logout failed');
-        // Optionally, still redirect
         router.push('/login');
       }
     } catch (error) {
       console.error('Logout error:', error);
-      // Optionally, still redirect
+
       router.push('/login');
     }
   };
@@ -40,11 +62,13 @@ const Header = () => {
           </Link>
         </p>
         <ul className={styles.headerLinks}>
-          <li>
-            <Link href="#" onClick={logout}>
-              Logout
-            </Link>
-          </li>
+          {isLoggedIn && (
+            <li>
+              <Link href="#" onClick={logout} >
+                Logout
+              </Link>
+            </li>
+          )}
           <li>
             <a href="https://github.com/jellyruby/jonghwaGIS" rel="noreferrer">
               <FaGithub />
